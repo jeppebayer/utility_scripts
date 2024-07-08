@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# ------------------ Usage ------------------------------------------------
+
+usage(){
+cat << EOF
+
+Usage: $(basename "$0") [<DIRECTORY>] [-h]
+
+Archive personal directory to decrease storage usage.
+An archived personal directory will be turned into a compressed tar archive
+file and moved to the 'people/archive' directory.
+
+OPTIONS:
+	-h					Show this message.
+
+EOF
+}
+
+# ------------------ Flag Processing --------------------------------------
+
+if [ -z "$1" ]; then
+	usage
+	exit 1
+fi
+
+while getopts 'h' OPTION; do
+	case "$OPTION" in
+		h)
+			usage
+			exit 0
+			;;
+		?)
+			echo -e "\nUnrecognized option"
+			usage
+			exit 2
+			;;
+	esac
+done
+
+# ------------------ Main -------------------------------------------------
+
+if [ ! -d "$(readlink -f "$1")" ]; then
+	echo -e "'$1' does not seems to be a directory."
+	exit 3
+fi
+
+mkdir -p /faststorage/project/EcoGenetics/people/archive
+cd "$(dirname "$(readlink -f "$1")")" || ( echo "Something is not right... Aborting" && exit 4 )
+tar -cf - "$(basename "$1")" | gzip -9 > /faststorage/project/EcoGenetics/people/archive/"$(basename "$1")"."$(date +"%d%m%Y")".tar.gz
+rm -rf "$(basename "$1")"
+echo -e "Archiving of '$(basename "$1")' complete"
+exit 0
