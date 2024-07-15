@@ -46,7 +46,7 @@ if [ ! -d "$(readlink -f "$1")" ]; then
 fi
 
 mkdir -p /faststorage/project/EcoGenetics/people/archive
-cd "$(dirname "$(readlink -f "$1")")" || ( echo "Something is not right... Aborting" && exit 4 )
+cd "$(dirname "$(readlink -f "$1")")" || { echo "Something is not right... Aborting"; exit 4; }
 tar -cf - "$(basename "$1")" | gzip -9 > /faststorage/project/EcoGenetics/people/archive/"$(basename "$1")"."$(date +"%d%m%Y")".tar.gz
 rm -rf "$(basename "$1")"
 echo -e "Archiving of '$(basename "$1")' complete"
